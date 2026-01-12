@@ -57,11 +57,7 @@ async function handleLogin() {
       router.push('/perfil') // Rota de perfil de usuário comum
     }
     
-    // Pequeno hack para atualizar o Header (que verifica o token no onMounted)
-    // Em apps reais usamos Pinia, mas isso resolve seu problema imediato:
-    setTimeout(() => {
-        window.location.reload()
-    }, 100)
+   
 
   } catch (err) {
     console.error('Erro no login:', err)

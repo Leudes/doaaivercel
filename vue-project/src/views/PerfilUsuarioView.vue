@@ -5,7 +5,6 @@ import { API_URL, STRAPI_URL } from '@/services/api'
 
 const router = useRouter()
 
-
 // Estado do Usuário
 const usuario = ref({
   id: null,
@@ -13,10 +12,10 @@ const usuario = ref({
   sobrenome: '',
   email: '',
   telefone: '',
-  fotoUrl: '/img/perfil/placeholder.png' // Caminho local ou placeholder
+  fotoUrl: '/img/perfil/placeholder.png' // Imagem padrão caso não tenha foto
 })
 
-// Estado da Interface
+// Estados da Tela
 const isEditing = ref(false)
 const loading = ref(true)
 const uploadingPhoto = ref(false)
@@ -31,53 +30,72 @@ const form = ref({
 onMounted(async () => {
   const token = localStorage.getItem('jwt')
 
+  // 1. Verificação básica de token
   if (!token) {
-    alert('Você precisa estar logado para acessar o perfil.')
     router.push('/login')
     return
   }
 
   try {
-    // Busca dados do usuário + foto + tipo (instituição)
+    // 2. Busca unificada com populate=* (Mais seguro contra erros de digitação)
     const res = await fetch(`${API_URL}/users/me?populate=*`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     
-    if (!res.ok) throw new Error('Erro ao buscar perfil')
+    // 3. Se der erro de autenticação (401), aí sim limpamos o token
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('UNAUTHORIZED')
+    }
+
+    if (!res.ok) throw new Error('Erro na conexão com o servidor')
     
     const data = await res.json()
 
-    // Redireciona se for instituição
+    // 4. Se for instituição, manda pro painel correto
     if (data.instituicao) {
-      router.push('/painel-instituicao') // Redireciona para o painel correto
+      router.replace('/painel-instituicao') // Use replace para não poluir o histórico
       return
     }
 
-    // Popula o estado
+    // 5. Montagem segura da URL da imagem
+    let urlFoto = '/img/perfil/placeholder.png'
+    
+    if (data.foto_perfil && data.foto_perfil.url) {
+      // Verifica se a URL já vem completa (Cloudinary/AWS) ou se precisa do domínio (Local/Upload padrão)
+      if (data.foto_perfil.url.startsWith('http')) {
+        urlFoto = data.foto_perfil.url
+      } else {
+        urlFoto = `${STRAPI_URL}${data.foto_perfil.url}`
+      }
+    }
+
+    // 6. Preenche os dados
     usuario.value = {
       id: data.id,
       nome: data.nome || '',
       sobrenome: data.sobrenome || '',
       email: data.email || '',
       telefone: data.telefone || '',
-      fotoUrl: data.foto_perfil?.url 
-        ? `${STRAPI_URL}${data.foto_perfil.url}` 
-        : '/img/perfil/placeholder.png' // Certifique-se de ter essa imagem em public/img/perfil/
+      fotoUrl: urlFoto
     }
 
   } catch (error) {
-    console.error(error)
-    //localStorage.removeItem('jwt')
-    router.push('/login')
+    console.error("Erro no perfil:", error)
+    
+    // Só desloga se for erro de Token inválido
+    if (error.message === 'UNAUTHORIZED') {
+      localStorage.removeItem('jwt')
+      router.push('/login')
+    }
+    // Se for outro erro (Network error), mantemos o usuário na tela para tentar de novo
   } finally {
     loading.value = false
   }
 })
 
-// --- Ações ---
+// --- Funções de Ação ---
 
 function ativarEdicao() {
-  // Copia dados atuais para o formulário
   form.value = {
     nome: usuario.value.nome,
     sobrenome: usuario.value.sobrenome,
@@ -93,7 +111,7 @@ function cancelarEdicao() {
 async function salvarEdicao() {
   const token = localStorage.getItem('jwt')
   try {
-    await fetch(`${API_URL}/users/${usuario.value.id}`, {
+    const res = await fetch(`${API_URL}/users/${usuario.value.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +120,9 @@ async function salvarEdicao() {
       body: JSON.stringify(form.value),
     })
 
-    // Atualiza dados na tela sem precisar recarregar
+    if (!res.ok) throw new Error('Erro ao atualizar')
+
+    // Atualiza visualmente
     usuario.value.nome = form.value.nome
     usuario.value.sobrenome = form.value.sobrenome
     usuario.value.telefone = form.value.telefone
@@ -124,7 +144,8 @@ async function handleFotoUpload(event) {
   uploadingPhoto.value = true
 
   try {
-    // 1. Upload da imagem
+    // 1. Enviar a imagem para o Strapi (Upload)
+    // IMPORTANTE: Não defina Content-Type aqui, o navegador faz sozinho para FormData
     const formData = new FormData()
     formData.append('files', arquivo)
 
@@ -134,12 +155,19 @@ async function handleFotoUpload(event) {
       body: formData,
     })
 
+    if (!resUpload.ok) throw new Error('Falha no upload da imagem')
+
     const result = await resUpload.json()
     const fotoId = result[0].id
-    const novaUrl = `${STRAPI_URL}${result[0].url}`
+    
+    // Monta a nova URL imediatamente para feedback visual
+    const novaUrlRelativa = result[0].url
+    const novaUrlCompleta = novaUrlRelativa.startsWith('http') 
+      ? novaUrlRelativa 
+      : `${STRAPI_URL}${novaUrlRelativa}`
 
-    // 2. Atualizar usuário com ID da imagem
-    await fetch(`${API_URL}/users/${usuario.value.id}`, {
+    // 2. Vincular a imagem ao Usuário
+    const resUser = await fetch(`${API_URL}/users/${usuario.value.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -148,13 +176,14 @@ async function handleFotoUpload(event) {
       body: JSON.stringify({ foto_perfil: fotoId }),
     })
 
-    // Atualiza a imagem na tela
-    usuario.value.fotoUrl = novaUrl
+    if (!resUser.ok) throw new Error('Falha ao vincular imagem ao perfil')
+
+    usuario.value.fotoUrl = novaUrlCompleta
     alert('Foto de perfil atualizada!')
 
   } catch (err) {
     console.error('Erro no upload:', err)
-    alert('Erro ao atualizar a foto.')
+    alert('Erro ao atualizar a foto. Verifique o tamanho do arquivo.')
   } finally {
     uploadingPhoto.value = false
   }
@@ -162,8 +191,7 @@ async function handleFotoUpload(event) {
 
 function handleSair() {
   localStorage.removeItem('jwt')
-  // Pequeno hack para limpar estados globais se houver, ou apenas redirecionar
-  window.location.href = '/login' 
+  router.push('/login')
 }
 
 function navegarPara(rota) {
@@ -173,7 +201,7 @@ function navegarPara(rota) {
 
 <template>
   <main>
-    <div v-if="loading">Carregando perfil...</div>
+    <div v-if="loading" style="margin-top: 50px;">Carregando perfil...</div>
 
     <div v-else class="perfil-container">
       <div class="esquerda">
@@ -185,6 +213,7 @@ function navegarPara(rota) {
             :src="usuario.fotoUrl" 
             class="foto-perfil" 
             :style="{ opacity: uploadingPhoto ? 0.5 : 1 }"
+            alt="Foto de perfil"
           />
           <label for="upload-foto" class="edita-foto" title="Alterar foto">&#9998;</label>
           <input 
@@ -194,7 +223,7 @@ function navegarPara(rota) {
             accept="image/*" 
             @change="handleFotoUpload"
           />
-          <span v-if="uploadingPhoto" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">...</span>
+          <span v-if="uploadingPhoto" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: #e91e63;">...</span>
         </div>
 
         <div id="dados-container">
@@ -203,8 +232,8 @@ function navegarPara(rota) {
             <p><strong>Email:</strong> <span id="perfil-email">{{ usuario.email }}</span></p>
             <p><strong>Telefone:</strong> <span id="perfil-telefone">{{ usuario.telefone }}</span></p>
             
-            <button @click="ativarEdicao" id="botao-editar" class="botao-editar" style="margin-top: 20px;">
-              Editar
+            <button @click="ativarEdicao" id="botao-editar" class="botao-menu" style="margin-top: 20px; justify-content: center;">
+              Editar Dados
             </button>
           </div>
 
@@ -219,8 +248,8 @@ function navegarPara(rota) {
             <input type="text" v-model="form.telefone" class="edit-form-input" />
             
             <div class="edit-form-actions">
-              <button @click="salvarEdicao" id="botao-salvar" class="botao-confirmar">Salvar</button>
-              <button @click="cancelarEdicao" id="botao-cancelar" class="botao-sair" style="background-color: #888">Cancelar</button>
+              <button @click="salvarEdicao" id="botao-salvar" class="botao-confirmar" style="background-color: #4caf50; color: white; border: none; border-radius: 5px;">Salvar</button>
+              <button @click="cancelarEdicao" id="botao-cancelar" class="botao-sair" style="background-color: #888; color: white; border: none; border-radius: 5px;">Cancelar</button>
             </div>
           </div>
         </div>
@@ -238,7 +267,6 @@ function navegarPara(rota) {
         <button class="botao-menu" @click="navegarPara('/campanhas')">
           Campanhas
         </button>
-    
 
         <button @click="handleSair" id="botao-sair" class="botao-sair" style="margin-top: 20px;">
           Sair
