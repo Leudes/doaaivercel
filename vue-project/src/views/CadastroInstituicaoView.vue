@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -39,7 +40,7 @@ async function handleCadastroInstituicao() {
 
   try {
     // --- PASSO 1: Criar o Usuário (Auth) ---
-    const resUser = await fetch('http://localhost:1337/api/auth/local/register', {
+    const resUser = await fetch(`${API_URL}/auth/local/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -61,7 +62,7 @@ async function handleCadastroInstituicao() {
     const userId = userData.user.id
 
     // --- PASSO 2: Criar a Instituição vinculada ao Usuário ---
-    const resInst = await fetch('http://localhost:1337/api/instituicaos', {
+    const resInst = await fetch(`${API_URL}/instituicaos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

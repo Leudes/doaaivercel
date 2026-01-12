@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { API_URL, STRAPI_URL} from '@/services/api'
 
 const campanhas = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-const API_URL = 'http://localhost:1337/api'
+
 
 async function fetchCampanhas() {
   loading.value = true
@@ -22,7 +23,7 @@ async function fetchCampanhas() {
     campanhas.value = data.map(item => {
       const attrs = item.attributes
       const fotoUrl = attrs.foto?.data?.attributes?.url 
-        ? `http://localhost:1337${attrs.foto.data.attributes.url}`
+        ? `${STRAPI_URL}${attrs.foto.data.attributes.url}`
         : 'https://via.placeholder.com/100' // Imagem padrão se não houver foto
 
       return {

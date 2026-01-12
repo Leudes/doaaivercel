@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const isLoggedIn = ref(false)
 const isInstituicao = ref(false)
@@ -11,7 +12,7 @@ onMounted(async () => {
     isLoggedIn.value = true
     try {
       // Ajuste a URL da API conforme necessário
-      const res = await fetch('http://localhost:1337/api/users/me?populate=instituicao', {
+      const res = await fetch(`${API_URL}/users/me?populate=instituicao`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const user = await res.json()

@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL, STRAPI_URL } from '@/services/api'
 
 const router = useRouter()
-const API_URL = 'http://localhost:1337/api'
+
 
 // Estado
 const doacoes = ref([])
@@ -21,7 +22,7 @@ function formatarData(dataString) {
 
 function getFotoUrl(item) {
   const url = item.attributes.foto?.data?.attributes?.url
-  return url ? `http://localhost:1337${url}` : 'https://via.placeholder.com/60'
+  return url ? `${STRAPI_URL}${url}` : 'https://via.placeholder.com/60'
 }
 
 function getNomeCategoria(item) {

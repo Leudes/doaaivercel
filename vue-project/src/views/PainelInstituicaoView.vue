@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL, STRAPI_URL } from '@/services/api'
 
 const router = useRouter()
-const API_URL = 'http://localhost:1337/api'
+
 
 // Listas de Solicitações por Status
 const pendentes = ref([])
@@ -19,7 +20,7 @@ const loading = ref(true)
 
 function getFotoUrl(item) {
   const url = item.attributes.foto?.data?.attributes?.url
-  return url ? `http://localhost:1337${url}` : 'https://via.placeholder.com/100'
+  return url ? `${STRAPI_URL}${url}` : 'https://via.placeholder.com/100'
 }
 
 function formatarData(dataString) {

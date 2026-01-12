@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL, STRAPI_URL } from '@/services/api'
 
 const router = useRouter()
-const API_URL = 'http://localhost:1337/api'
+
 
 // Estado do Usuário
 const usuario = ref({
@@ -60,7 +61,7 @@ onMounted(async () => {
       email: data.email || '',
       telefone: data.telefone || '',
       fotoUrl: data.foto_perfil?.url 
-        ? `http://localhost:1337${data.foto_perfil.url}` 
+        ? `${STRAPI_URL}${data.foto_perfil.url}` 
         : '/img/perfil/placeholder.png' // Certifique-se de ter essa imagem em public/img/perfil/
     }
 
@@ -135,7 +136,7 @@ async function handleFotoUpload(event) {
 
     const result = await resUpload.json()
     const fotoId = result[0].id
-    const novaUrl = `http://localhost:1337${result[0].url}`
+    const novaUrl = `${STRAPI_URL}${result[0].url}`
 
     // 2. Atualizar usuário com ID da imagem
     await fetch(`${API_URL}/users/${usuario.value.id}`, {

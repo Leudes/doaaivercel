@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -22,7 +23,7 @@ const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-const API_URL = 'http://localhost:1337/api'
+
 
 // --- 1. Inicialização e Carregamento de Dados ---
 onMounted(async () => {

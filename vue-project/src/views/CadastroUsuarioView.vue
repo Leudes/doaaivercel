@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -36,7 +37,7 @@ async function handleCadastro() {
   const username = `${nome.value.toLowerCase()}_${sobrenome.value.toLowerCase()}`.replace(/\s+/g, '_')
 
   try {
-    const response = await fetch('http://localhost:1337/api/auth/local/register', {
+    const response = await fetch(`${API_URL}/auth/local/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

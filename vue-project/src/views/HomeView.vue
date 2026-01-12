@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -13,7 +14,7 @@ async function handleDoar() {
 
   // Verificação rápida se é instituição (opcional repetir a chamada ou confiar no localStorage se você salvar o tipo lá)
   try {
-    const res = await fetch('http://localhost:1337/api/users/me?populate=instituicao', {
+    const res = await fetch(`${API_URL}/users/me?populate=instituicao`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     const user = await res.json()

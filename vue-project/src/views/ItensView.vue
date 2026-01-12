@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { API_URL, STRAPI_URL } from '@/services/api'
 
-const API_URL = 'http://localhost:1337/api'
+
 const itens = ref([])
 const categorias = ref([])
 const selectedCategory = ref('all')
@@ -10,7 +11,7 @@ const loading = ref(false)
 // --- Funções Auxiliares para extrair dados do Strapi ---
 function getFotoUrl(item) {
   const url = item.attributes.foto?.data?.attributes?.url
-  return url ? `http://localhost:1337${url}` : 'https://via.placeholder.com/300'
+  return url ? `${STRAPI_URL}${url}` : 'https://via.placeholder.com/300'
 }
 
 function getNomeDoador(item) {

@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { API_URL , STRAPI_URL} from '@/services/api'
 
 const route = useRoute()
 const loading = ref(true)
 const campanha = ref(null)
 
-// URL da API (ajuste conforme seu Strapi)
-const API_URL = 'http://localhost:1337/api'
+
 
 async function fetchCampanhaDetalhes() {
   const id = route.params.id // Pega o ID da URL (ex: /campanha/1)
@@ -28,7 +28,7 @@ async function fetchCampanhaDetalhes() {
       local: data.attributes.local_arrecadacao || 'Local não informado',
       periodo: `${data.attributes.data_inicio} – ${data.attributes.data_fim}`,
       imagem: data.attributes.foto?.data?.attributes?.url 
-        ? `http://localhost:1337${data.attributes.foto.data.attributes.url}`
+        ? `${STRAPI_URL}${data.attributes.foto.data.attributes.url}`
         : 'https://via.placeholder.com/800x400'
     }
 

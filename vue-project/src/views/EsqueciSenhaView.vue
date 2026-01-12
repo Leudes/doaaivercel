@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 const email = ref('')
@@ -20,7 +21,7 @@ async function handleRecuperar() {
   loading.value = true
 
   try {
-    const res = await fetch('http://localhost:1337/api/auth/forgot-password', {
+    const res = await fetch(`${API_URL}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value }),

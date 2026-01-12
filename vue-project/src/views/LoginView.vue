@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
+import { API_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -23,7 +24,7 @@ async function handleLogin() {
 
   try {
     // 1. Tenta fazer o login
-    const res = await fetch('http://localhost:1337/api/auth/local', {
+    const res = await fetch(`${API_URL}/auth/local`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: email.value, password: password.value }),
@@ -40,7 +41,7 @@ async function handleLogin() {
 
     // 3. Busca os dados do usuário para saber se é Instituição
     // O populate=instituicao é essencial para sua lógica de redirecionamento
-    const meRes = await fetch('http://localhost:1337/api/users/me?populate=instituicao', {
+    const meRes = await fetch(`${API_URL}/users/me?populate=instituicao`, {
       headers: { Authorization: `Bearer ${data.jwt}` },
     })
     
