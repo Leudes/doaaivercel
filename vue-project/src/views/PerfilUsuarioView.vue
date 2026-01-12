@@ -67,7 +67,7 @@ onMounted(async () => {
 
   } catch (error) {
     console.error(error)
-    localStorage.removeItem('jwt')
+    //localStorage.removeItem('jwt')
     router.push('/login')
   } finally {
     loading.value = false
