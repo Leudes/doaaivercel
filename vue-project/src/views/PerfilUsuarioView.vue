@@ -39,7 +39,7 @@ onMounted(async () => {
 
   try {
     // Busca dados do usuário + foto + tipo (instituição)
-    const res = await fetch(`${API_URL}/users/me?populate=instituicao,foto_perfil`, {
+    const res = await fetch(`${API_URL}/users/me?populate=*`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     
