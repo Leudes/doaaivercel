@@ -1,29 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router' // 1. Importar o roteador
 import { API_URL, STRAPI_URL } from '@/services/api'
 
-const router = useRouter() // 2. Instanciar o roteador
 
 const itens = ref([])
 const categorias = ref([])
 const selectedCategory = ref('all')
 const loading = ref(false)
 
-// --- Função de Navegação ---
-function verDetalhes(id) {
-  // Navega para a rota configurada anteriormente (/itens/:id)
-  router.push(`/itens/${id}`)
-}
-
-// --- Funções Auxiliares ---
+// --- Funções Auxiliares para extrair dados do Strapi ---
 function getFotoUrl(item) {
   const url = item.attributes.foto?.data?.attributes?.url
-  // Verifica se é link externo (Cloudinary) ou local (precisa do STRAPI_URL)
-  if (url) {
-    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`
-  }
-  return 'https://via.placeholder.com/300'
+  return url ? `${STRAPI_URL}${url}` : 'https://via.placeholder.com/300'
 }
 
 function getNomeDoador(item) {
@@ -58,10 +46,12 @@ async function fetchCategorias() {
 
 async function fetchItens() {
   loading.value = true
-  itens.value = [] 
+  itens.value = [] // Limpa lista atual
 
+  // URL base com filtro de aceito e populações necessárias
   let url = `${API_URL}/solicitacaos?filters[status][$eq]=aceito&populate=foto,users_permissions_user,instituicao.users_permissions_user,categoria`
 
+  // Adiciona filtro de categoria se não for "all"
   if (selectedCategory.value !== 'all') {
     url += `&filters[categoria][id][$eq]=${selectedCategory.value}`
   }
@@ -78,6 +68,7 @@ async function fetchItens() {
   }
 }
 
+// Inicialização
 onMounted(() => {
   fetchCategorias()
   fetchItens()
@@ -123,14 +114,12 @@ onMounted(() => {
       <div 
         v-for="item in itens" 
         :key="item.id" 
-        class="item-card clickable-card"
-        @click="verDetalhes(item.id)"
-        title="Clique para ver detalhes"
+        class="item-card"
       >
         <div class="item-image-wrapper">
           <img :src="getFotoUrl(item)" :alt="item.attributes.titulo || 'Item'" />
           <div class="item-description-overlay">
-            <p>Clique para ver detalhes</p>
+            <p>{{ item.attributes.descricao || 'Sem descrição.' }}</p>
           </div>
         </div>
         
@@ -145,20 +134,3 @@ onMounted(() => {
     </div>
   </main>
 </template>
-
-<style scoped>
-/* Adicione isso para melhorar a experiência do usuário */
-.clickable-card {
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.clickable-card:hover {
-  transform: translateY(-5px); /* Efeito de "levantar" o card */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* Sombra mais forte */
-}
-
-.clickable-card:active {
-  transform: scale(0.98); /* Efeito de clique */
-}
-</style>
