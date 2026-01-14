@@ -45,4 +45,3 @@ O projeto foi desenvolvido como parte da disciplina de **[Nome da Disciplina]** 
 - **Render** (Hospedagem do Backend e Banco de Dados)
 
 ---
-
