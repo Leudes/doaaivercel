@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { API_URL } from '@/services/api'
-import { authState } from '@/services/auth'
 
 const router = useRouter()
 
@@ -39,7 +38,6 @@ async function handleLogin() {
 
     // 2. Salva o token
     localStorage.setItem('jwt', data.jwt)
-    authState.login(data.jwt)
 
     // 3. Busca os dados do usuário para saber se é Instituição
     // O populate=instituicao é essencial para sua lógica de redirecionamento

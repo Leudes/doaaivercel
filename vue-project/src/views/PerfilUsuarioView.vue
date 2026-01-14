@@ -2,8 +2,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_URL, STRAPI_URL } from '@/services/api'
-import { authState } from '@/services/auth'
-import { a } from 'vitest/dist/chunks/suite.d.BJWk38HB'
 
 const router = useRouter()
 
@@ -193,7 +191,6 @@ async function handleFotoUpload(event) {
 
 function handleSair() {
   localStorage.removeItem('jwt')
-  authState.logout()
   router.push('/login')
 }
 

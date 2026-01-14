@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { API_URL } from '@/services/api'
-import { authState } from '@/services/auth'
 
 const isLoggedIn = ref(false)
 const isInstituicao = ref(false)
