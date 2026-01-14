@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { API_URL } from '@/services/api'
+import { authState } from '@/services/auth'
 
 const isLoggedIn = ref(false)
 const isInstituicao = ref(false)
@@ -39,7 +40,7 @@ onMounted(async () => {
           <RouterLink to="/quero-doar">Doar</RouterLink>
         </li>
 
-        <li v-if="isLoggedIn">
+        <li v-if="authState.isAuthenticated">
           <RouterLink :to="isInstituicao ? '/perfil-instituicao' : '/perfil'">
             Seu Perfil
           </RouterLink>
