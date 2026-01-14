@@ -40,7 +40,7 @@ onMounted(async () => {
           <RouterLink to="/quero-doar">Doar</RouterLink>
         </li>
 
-        <li v-if="authState.isAuthenticated">
+        <li v-if="isLoggedIn">
           <RouterLink :to="isInstituicao ? '/perfil-instituicao' : '/perfil'">
             Seu Perfil
           </RouterLink>
