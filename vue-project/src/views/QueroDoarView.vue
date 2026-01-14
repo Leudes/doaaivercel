@@ -13,6 +13,7 @@ const selectedCategoria = ref('')
 const selectedInstituicao = ref('')
 const selectedFile = ref(null)
 const fileName = ref('')
+const isAnonimo = ref(false) // <--- NOVA VARIÁVEL AQUI
 
 // Dados da API
 const categorias = ref([])
@@ -22,8 +23,6 @@ const instituicoes = ref([])
 const loading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-
-
 
 // --- 1. Inicialização e Carregamento de Dados ---
 onMounted(async () => {
@@ -36,7 +35,6 @@ onMounted(async () => {
   }
 
   try {
-    // Verifica se o usuário é instituição (segurança extra frontend)
     const userRes = await fetch(`${API_URL}/users/me?populate=instituicao`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -48,12 +46,10 @@ onMounted(async () => {
       return
     }
 
-    // Busca Categorias
     const catRes = await fetch(`${API_URL}/categorias`)
     const catData = await catRes.json()
     categorias.value = catData.data
 
-    // Busca Instituições (populando o user para pegar o nome correto)
     const instRes = await fetch(`${API_URL}/instituicaos?populate=users_permissions_user`)
     const instData = await instRes.json()
     instituicoes.value = instData.data
@@ -97,7 +93,6 @@ async function handleSubmit() {
     const uploadData = await uploadRes.json()
     const fotoId = uploadData[0].id
 
-    // Pega ID do usuário atual
     const userRes = await fetch(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -113,7 +108,8 @@ async function handleSubmit() {
         foto: fotoId,
         users_permissions_user: user.id,
         instituicao: selectedInstituicao.value,
-        categoria: selectedCategoria.value
+        categoria: selectedCategoria.value,
+        anonimo: isAnonimo.value // <--- ENVIANDO A OPÇÃO PARA O STRAPI
       }
     }
 
@@ -130,7 +126,6 @@ async function handleSubmit() {
 
     successMessage.value = 'Proposta de doação enviada com sucesso!'
     
-    // Redireciona para o Perfil após 1.5s
     setTimeout(() => {
       router.push('/perfil')
     }, 1500)
@@ -237,6 +232,16 @@ async function handleSubmit() {
           class="form-input" 
           required 
         />
+      </div>
+
+      <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+        <input 
+          type="checkbox" 
+          id="item-anonimo" 
+          v-model="isAnonimo"
+          style="width: 20px; height: 20px; cursor: pointer;"
+        />
+        <label for="item-anonimo" style="cursor: pointer; margin: 0;">Quero que essa doação seja anônima</label>
       </div>
 
       <p v-if="errorMessage" style="color: red; margin-bottom: 15px;">{{ errorMessage }}</p>

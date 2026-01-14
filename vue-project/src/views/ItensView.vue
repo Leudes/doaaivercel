@@ -15,6 +15,9 @@ function getFotoUrl(item) {
 }
 
 function getNomeDoador(item) {
+  if (item.attributes.anonimo) {
+    return 'Anônimo'
+  } 
   const doador = item.attributes.users_permissions_user?.data?.attributes
   return doador?.nome || doador?.username || 'Anônimo'
 }
