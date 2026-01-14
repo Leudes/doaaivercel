@@ -484,6 +484,7 @@ export interface ApiSolicitacaoSolicitacao extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    anonimo: Attribute.Boolean;
     categoria: Attribute.Relation<
       'api::solicitacao.solicitacao',
       'oneToOne',
