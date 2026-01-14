@@ -14,7 +14,6 @@ import QueroDoarView from '../views/QueroDoarView.vue'
 import MinhasDoacoesView from '../views/MinhasDoacoesView.vue'
 import EsqueciSenhaView from '../views/EsqueciSenhaView.vue'
 import RedefinirSenhaView from '../views/RedefinirSenhaView.vue'
-import ItemDetalhesView from '../views/ItemDetalhesView.vue'
 
 // --- Lazy Loading para Cadastros (Otimização) ---
 const CadastroUsuarioView = () => import('../views/CadastroUsuarioView.vue')
