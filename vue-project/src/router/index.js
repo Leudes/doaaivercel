@@ -14,6 +14,7 @@ import QueroDoarView from '../views/QueroDoarView.vue'
 import MinhasDoacoesView from '../views/MinhasDoacoesView.vue'
 import EsqueciSenhaView from '../views/EsqueciSenhaView.vue'
 import RedefinirSenhaView from '../views/RedefinirSenhaView.vue'
+import ItemDetalhesView from '../views/ItemDetalhesView.vue'
 
 // --- Lazy Loading para Cadastros (Otimização) ---
 const CadastroUsuarioView = () => import('../views/CadastroUsuarioView.vue')
@@ -111,6 +112,12 @@ const router = createRouter({
       path: '/configuracoes',
       name: 'configuracoes',
       component: { template: '<main style="text-align:center; padding:50px;"><h1>Configurações</h1><p>Em construção...</p></main>' }
+    },
+
+    {
+      path: '/itens/:id', // O ":id" indica que é um parametro dinâmico
+      name: 'item-detalhes',
+      component: ItemDetalhesView
     }
   ]
 })
