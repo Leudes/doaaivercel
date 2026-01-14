@@ -39,7 +39,7 @@ async function handleLogin() {
 
     // 2. Salva o token
     localStorage.setItem('jwt', data.jwt)
-    authState.login(data.jwt)
+    
 
     // 3. Busca os dados do usuário para saber se é Instituição
     // O populate=instituicao é essencial para sua lógica de redirecionamento
@@ -49,6 +49,7 @@ async function handleLogin() {
     
     const meData = await meRes.json()
 
+    authState.login(data.jwt, meData.instituicao)
     // 4. Redirecionamento condicional
     // Como o Header não atualiza sozinho sem um gerenciador de estado (Pinia), 
     // forçamos uma atualização rápida ou apenas navegamos.

@@ -54,7 +54,7 @@ onMounted(async () => {
 
     // 4. Se for instituição, manda pro painel correto
     if (data.instituicao) {
-      router.replace('/painel-instituicao') // Use replace para não poluir o histórico
+      router.replace('/perfil-instituicao') // Use replace para não poluir o histórico
       return
     }
 

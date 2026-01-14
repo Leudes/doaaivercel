@@ -36,12 +36,12 @@ onMounted(async () => {
         <li><RouterLink to="/itens">Itens</RouterLink></li>
         <li><RouterLink to="/campanhas">Campanhas</RouterLink></li>
         
-        <li v-if="!isInstituicao">
+        <li v-if="!authState.isInstitution">
           <RouterLink to="/quero-doar">Doar</RouterLink>
         </li>
 
         <li v-if="authState.isAuthenticated">
-          <RouterLink :to="isInstituicao ? '/perfil-instituicao' : '/perfil'">
+          <RouterLink :to="authState.isInstitution ? '/perfil-instituicao' : '/perfil'">
             Seu Perfil
           </RouterLink>
         </li>
