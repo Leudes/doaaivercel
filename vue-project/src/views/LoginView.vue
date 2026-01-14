@@ -52,7 +52,7 @@ async function handleLogin() {
     // forçamos uma atualização rápida ou apenas navegamos.
     
     if (meData.instituicao) {
-      router.push('/painel-instituicao') // Rota que criaremos futuramente
+      router.push('/perfil-instituicao') // Rota que criaremos futuramente
     } else {
       router.push('/perfil') // Rota de perfil de usuário comum
     }
