@@ -14,5 +14,21 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+    
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      // Arquivos para ignorar na contagem (pois não têm lógica para testar)
+      exclude: [
+        'src/main.js', 
+        'src/App.vue', 
+        '*.config.js', 
+        'dist/**'
+      ] 
+    }
+  }
 })
